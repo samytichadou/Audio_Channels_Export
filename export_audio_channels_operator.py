@@ -137,6 +137,9 @@ class ExportAudioChannelsSeparately(bpy.types.Operator):
     def invoke(self, context, event):
         self.channels = check_for_audio_channel(context)
 
+        if len(self.channels) == 0:
+            return self.execute(context)
+
         for channel in range(1,33):
             prop = "channel" + str(channel)
             if channel in self.channels:
@@ -159,5 +162,8 @@ class ExportAudioChannelsSeparately(bpy.types.Operator):
             col.prop(self, prop)
 
     def execute(self, context):
-        main(self, context)
+        if len(self.channels) == 0:
+            print("no valid audio channel to export")
+        else:
+            main(self, context)
         return {'FINISHED'}
