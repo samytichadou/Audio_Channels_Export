@@ -1,11 +1,13 @@
 import bpy
 import os
 
+from .preferences import get_addon_preferences
 
-def check_for_audio_channel(context):
+def check_for_audio_channel(self, context):
 
-    print()
-    print("starting audio channels export")
+
+    if self.debug: print("starting audio channels export operator") #debug      
+
     seq = context.scene.sequence_editor
 
     channels = []
@@ -16,16 +18,18 @@ def check_for_audio_channel(context):
             if strip.channel not in channels:
                 channels.append(strip.channel)
     
-    print("returning valid audio channels : " + str(channels))
-    
+    if self.debug: print("returning valid audio channels : " + str(channels)) #debug
+        
     return channels
 
 
 def main(self, context):
+
+    if self.debug: print("starting audio channels export process") #debug
     
     #check export folder
     if not os.path.isdir(self.export_folder):
-        print("export folder does not exist")
+        print("Export folder does not exist")
         return 
     
     seq = context.scene.sequence_editor
@@ -49,21 +53,19 @@ def main(self, context):
             file = name + "channel_" + str(channel).zfill(2) + ".wav"
             export_filepath = os.path.join(self.export_folder, file)
 
-            export_audio_channel(seq, channel, export_filepath)
+            export_audio_channel(seq, channel, export_filepath, self.debug)
 
     if chk_export:
-        print("audio channels successfully exported")
+        print("Audio channels successfully exported")
     else:
-        print("no audio channels chosen for export")
+        print("No audio channels chosen for export")
 
 
-def export_audio_channel(sequencer, channel, export_filepath):
+def export_audio_channel(sequencer, channel, export_filepath, debug):
 
     audio_to_unhide = []
-
-    print()
-    print("processing --- channel " + str(channel))
-    print()
+    
+    if debug: print("processing --- channel " + str(channel)) #debug
     
     # hide audio from different channels
     for strip in sequencer.sequences_all:
@@ -72,13 +74,15 @@ def export_audio_channel(sequencer, channel, export_filepath):
             
             if strip.type == "SOUND" and not strip.mute:
                 
-                print("hiding --- " + strip.name)
+                if debug: print("hiding --- " + strip.name) #debug
+                
                 audio_to_unhide.append(strip)
                 strip.mute = True
     
     # export audio
-    print()
+
     print("exporting --- " + export_filepath)
+
     bpy.ops.sound.mixdown(
         filepath=export_filepath,
         check_existing=False,
@@ -86,15 +90,16 @@ def export_audio_channel(sequencer, channel, export_filepath):
         container='WAV',
         codec='PCM',
         )
-    print()
 
     # unhide audio
     for strip in audio_to_unhide:
-        print("unhiding --- " + strip.name)
+
+        if debug: print("unhiding --- " + strip.name) #debug
+        
         strip.mute = False
 
-    print()
-    print("finished processing --- channel " + str(channel))
+    if debug: print("finished processing --- channel " + str(channel)) #debug
+         
 
 
 class ExportAudioChannelsSeparately(bpy.types.Operator):
@@ -103,6 +108,7 @@ class ExportAudioChannelsSeparately(bpy.types.Operator):
     bl_label = "Export Audio Channels"
     
     channels = []
+    debug = None
     export_folder : bpy.props.StringProperty(name = "Export folder")
     export_name : bpy.props.StringProperty(name = "Export name")
 
@@ -146,7 +152,14 @@ class ExportAudioChannelsSeparately(bpy.types.Operator):
         return True
     
     def invoke(self, context, event):
-        self.channels = check_for_audio_channel(context)
+
+        # get debug value from prefs
+
+        self.debug = get_addon_preferences().debug_toggle
+
+        # get audio channels and set props accordingly
+
+        self.channels = check_for_audio_channel(self, context)
 
         if len(self.channels) == 0:
             return self.execute(context)
@@ -174,7 +187,7 @@ class ExportAudioChannelsSeparately(bpy.types.Operator):
 
     def execute(self, context):
         if len(self.channels) == 0:
-            print("no valid audio channel to export")
+            print("No valid audio channel to export")
         else:
             main(self, context)
         return {'FINISHED'}

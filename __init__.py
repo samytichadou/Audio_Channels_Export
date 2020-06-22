@@ -32,14 +32,17 @@ bl_info = {
 
 import bpy
 
-from .gui import export_audio_channels_menu
+from .preferences import AudioChannelsExportPrefs
 from .export_audio_channels_operator import ExportAudioChannelsSeparately
+from .gui import export_audio_channels_menu
 
 def register():
+    bpy.utils.register_class(AudioChannelsExportPrefs)
     bpy.utils.register_class(ExportAudioChannelsSeparately)
     bpy.types.TOPBAR_MT_file_export.append(export_audio_channels_menu)
 
 
 def unregister():
+    bpy.utils.unregister_class(AudioChannelsExportPrefs)
     bpy.utils.unregister_class(ExportAudioChannelsSeparately)
     bpy.types.TOPBAR_MT_file_export.remove(export_audio_channels_menu)
