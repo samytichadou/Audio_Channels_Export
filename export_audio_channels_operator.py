@@ -103,7 +103,7 @@ class ExportAudioChannelsSeparately(bpy.types.Operator):
     bl_label = "Export Audio Channels"
     
     channels = []
-    export_folder : bpy.props.StringProperty(name = "Export folder", default = r"C:\Users\tonton\Desktop\test_audio_split")
+    export_folder : bpy.props.StringProperty(name = "Export folder")
     export_name : bpy.props.StringProperty(name = "Export name")
 
     # channels enabled
