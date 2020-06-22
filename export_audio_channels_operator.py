@@ -29,21 +29,32 @@ def main(self, context):
         return 
     
     seq = context.scene.sequence_editor
+
+    chk_export = False
     
     # per channels
     for channel in self.channels:
 
-        if self.export_name.endswith("_"):
-            name = self.export_name
-        else:
-            name = self.export_name + "_"
-            
-        file = name + "channel_" + str(channel).zfill(2) + ".wav"
-        export_filepath = os.path.join(self.export_folder, file)
+        prop = "channel" + str(channel)
 
-        export_audio_channel(seq, channel, export_filepath)
+        if getattr(self, prop):
 
-    print("audio channels successfully exported")
+            chk_export = True
+
+            if self.export_name.endswith("_"):
+                name = self.export_name
+            else:
+                name = self.export_name + "_"
+                
+            file = name + "channel_" + str(channel).zfill(2) + ".wav"
+            export_filepath = os.path.join(self.export_folder, file)
+
+            export_audio_channel(seq, channel, export_filepath)
+
+    if chk_export:
+        print("audio channels successfully exported")
+    else:
+        print("no audio channels chosen for export")
 
 
 def export_audio_channel(sequencer, channel, export_filepath):
