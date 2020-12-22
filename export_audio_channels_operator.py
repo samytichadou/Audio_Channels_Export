@@ -26,11 +26,16 @@ def check_for_audio_channel(self, context):
 def main(self, context):
 
     if self.debug: print("starting audio channels export process") #debug
-    
+
+    export_folder = bpy.path.abspath(self.export_folder)
+
     #check export folder
-    if not os.path.isdir(self.export_folder):
+    if self.create_folder:
+        os.makedirs(export_folder, exist_ok=True)
+    elif not os.path.isdir(export_folder):
         print("Export folder does not exist")
         return 
+
     
     seq = context.scene.sequence_editor
 
@@ -51,7 +56,7 @@ def main(self, context):
                 name = self.export_name + "_"
                 
             file = name + "channel_" + str(channel).zfill(2) + ".wav"
-            export_filepath = os.path.join(self.export_folder, file)
+            export_filepath = os.path.join(export_folder, file)
 
             export_audio_channel(seq, channel, export_filepath, self.debug)
 
@@ -111,6 +116,7 @@ class ExportAudioChannelsSeparately(bpy.types.Operator):
     debug = None
     export_folder : bpy.props.StringProperty(name = "Export folder")
     export_name : bpy.props.StringProperty(name = "Export name")
+    create_folder : bpy.props.BoolProperty(name = "Create target folder", default=True)
 
     # channels enabled
     channel1 : bpy.props.BoolProperty(name = "Channel 1")
@@ -177,6 +183,7 @@ class ExportAudioChannelsSeparately(bpy.types.Operator):
         layout = self.layout
         layout.prop(self, "export_folder")
         layout.prop(self, "export_name")
+        layout.prop(self, "create_folder")
 
         col = layout.column(align=True)
         col.label(text="Audio Channels : ")
