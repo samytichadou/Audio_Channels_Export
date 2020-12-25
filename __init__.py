@@ -21,9 +21,9 @@ Created by Samy Tichadou
 bl_info = {
     "name": "Audio Channels Export",
     "description": "Export Audio Channels from Sequencer separately",
-    "author": "Samy Tichadou (tonton)",
-    "version": (1, 0, 0),
-    "blender": (2, 83, 0),
+    "author": "Samy Tichadou (tonton), gabrielmontagne",
+    "version": (1, 1, 0),
+    "blender": (2, 91, 0),
     "location": "File > Export > Export Audio Channels",
     "wiki_url": "",
     "tracker_url": "",
