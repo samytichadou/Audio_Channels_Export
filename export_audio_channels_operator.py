@@ -26,11 +26,10 @@ def check_for_audio_channel(self, context):
 def main(self, context):
 
     if self.debug: print("starting audio channels export process") #debug
-    
-    #check export folder
-    if not os.path.isdir(self.export_folder):
-        print("Export folder does not exist")
-        return 
+
+    export_folder = bpy.path.abspath(self.export_folder)
+    os.makedirs(export_folder, exist_ok=True)
+
     
     seq = context.scene.sequence_editor
 
@@ -51,7 +50,7 @@ def main(self, context):
                 name = self.export_name + "_"
                 
             file = name + "channel_" + str(channel).zfill(2) + ".wav"
-            export_filepath = os.path.join(self.export_folder, file)
+            export_filepath = os.path.join(export_folder, file)
 
             export_audio_channel(seq, channel, export_filepath, self.debug)
 
